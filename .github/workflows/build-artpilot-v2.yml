@@ -1,0 +1,29 @@
+name: Build ArtPilot script v2
+
+on:
+  push:
+    paths:
+      - '.build/v2-part-*.b64'
+      - '.github/workflows/build-artpilot-v2.yml'
+      - '.build/v2-trigger.txt'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Rebuild Illustrator script
+        shell: bash
+        run: |
+          cat .build/v2-part-*.b64 | tr -d '\r\n ' | base64 -d | gzip -d > AI_工具箱.jsx
+          test "$(wc -c < AI_工具箱.jsx)" -eq 134123
+          test "$(sha256sum AI_工具箱.jsx | cut -d' ' -f1)" = "f0355b2563593e893928517bb9dedab5a0692f64dbe4e39eb502decad49fd3b0"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add AI_工具箱.jsx
+          git diff --cached --quiet || git commit -m "Add ArtPilot Illustrator script"
+          git push
