@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>灵绘</title>
+    <link rel="stylesheet" href="./css/panel.css">
+</head>
+<body>
+    <div class="plugin-shell">
+        <header class="titlebar">
+            <h1>灵绘</h1>
+            <button class="icon-button close-button" type="button" aria-label="关闭面板" data-action="close">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+            </button>
+        </header>
+
+        <nav class="tabs" role="tablist" aria-label="灵绘功能">
+            <button class="tab is-active" type="button" role="tab" aria-selected="true" aria-controls="page-size" data-page="size">尺寸</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-links" data-page="links">链接</button>
+            <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-compress" data-page="compress">无损压缩</button>
+        </nav>
+
+        <main class="page-viewport">
+            <section class="page" id="page-size" role="tabpanel" aria-label="尺寸">
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M8 4v5m8-5v5M4 8h5m6 0h5"/></svg>
+                        <h2>尺寸设置</h2>
+                    </div>
+                    <div class="dimension-row">
+                        <label class="dimension-field"><span>W</span><input id="width-input" type="number" value="30" min="0" step="0.1" aria-label="宽度"></label>
+                        <label class="dimension-field"><span>H</span><input id="height-input" type="number" value="30" min="0" step="0.1" aria-label="高度"></label>
+                        <select id="unit-select" class="unit-select" aria-label="尺寸单位"><option>mm</option><option>cm</option><option>px</option><option>pt</option><option>in</option></select>
+                    </div>
+                    <div class="option-row">
+                        <label class="check-option"><input id="keep-ratio" type="checkbox" checked><span class="checkmark" aria-hidden="true"></span><span>锁定比例</span></label>
+                        <label class="check-option"><input id="scale-stroke" type="checkbox"><span class="checkmark" aria-hidden="true"></span><span>缩放描边</span></label>
+                    </div>
+                    <button class="button button-secondary button-wide" type="button" data-action="size-read">读取尺寸</button>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg>
+                        <h2>统一应用</h2>
+                    </div>
+                    <div class="button-grid button-grid-three">
+                        <button class="button button-secondary" type="button" data-action="size-width">统一宽度</button>
+                        <button class="button button-secondary" type="button" data-action="size-height">统一高度</button>
+                        <button class="button button-secondary" type="button" data-action="size-both">统一尺寸</button>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 1v3m0 16v3M1 12h3m16 0h3"/></svg>
+                        <h2>缩放基准</h2>
+                    </div>
+                    <label class="anchor-field"><span>基准</span><select id="anchor-select" aria-label="缩放基准"><option>中心</option><option>左上</option><option>上</option><option>右上</option><option>左</option><option>右</option><option>左下</option><option>下</option><option>右下</option></select></label>
+                </section>
+            </section>
+
+            <section class="page" id="page-links" role="tabpanel" aria-label="链接" hidden>
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                        <h2>快捷操作</h2>
+                    </div>
+                    <div class="button-grid button-grid-two">
+                        <button class="button button-action" type="button" data-action="link-replace"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M13 3v5h5M20 3v5m-2.5-2.5h5M14 15a4 4 0 1 0 1.17 2.83L19 14"/></svg><span>单图替换</span></button>
+                        <button class="button button-action" type="button" data-action="link-batch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-7-6Zm0 0v6h7M8 13h8M8 17h8"/><path d="M9 1H5a2 2 0 0 0-2 2v13"/></svg><span>批量替换</span></button>
+                        <button class="button button-action" type="button" data-action="link-swap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h13l-3-3m3 3-3 3M17 17H4l3 3m-3-3 3-3"/></svg><span>互换链接</span></button>
+                        <button class="button button-action" type="button" data-action="link-same"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="16" cy="9" r="1.5"/><path d="m4 17 5-5 4 4 2-2 5 5"/></svg><span>同图替换</span></button>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon heading-icon-accent" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l3-3A5 5 0 0 0 13 2.93l-1.72 1.72M14 11a5 5 0 0 0-7.07 0l-3 3A5 5 0 0 0 11 21.07l1.72-1.72"/></svg>
+                        <h2>链接修复</h2>
+                    </div>
+                    <div class="path-row">
+                        <input id="path-input" class="text-input path-input" type="text" value="" aria-label="链接搜索路径">
+                        <button class="button button-small" type="button" data-action="path-clear">清空路径</button>
+                    </div>
+                    <div class="button-grid button-grid-two path-actions">
+                        <button class="button button-secondary button-with-icon" type="button" data-action="path-folder"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h5l2 2h7a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg><span>选文件夹</span></button>
+                        <button class="button button-secondary button-with-icon" type="button" data-action="path-locate"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4m-5-8v6m-3-3h6"/></svg><span>定位目录</span></button>
+                    </div>
+                    <label class="check-option recursive-option"><input id="recursive-check" type="checkbox"><span class="checkmark" aria-hidden="true"></span><span>搜索子目录</span></label>
+                    <button class="button button-primary button-wide button-with-icon" type="button" data-action="relink"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m13-5h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3m13 5h3a2 2 0 0 0 2-2v-3"/><circle cx="12" cy="12" r="3"/></svg><span>扫描修复</span></button>
+                </section>
+
+                <section class="card result-card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6h12M9 12h12M9 18h12M3 6h.01M3 12h.01M3 18h.01"/></svg>
+                        <h2>执行结果</h2>
+                    </div>
+                    <div id="link-result" class="result-box" role="log" aria-live="polite">尚未执行。</div>
+                </section>
+            </section>
+
+            <section class="page" id="page-compress" role="tabpanel" aria-label="无损压缩" hidden>
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H5V3h2Zm7 0v6h5M8 13h8M8 17h8"/></svg>
+                        <h2>文件扫描</h2>
+                    </div>
+                    <div id="compress-result" class="result-box scan-box" role="status">未扫描</div>
+                    <button class="button button-primary button-wide button-with-icon" type="button" data-action="compress-scan"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5m-10.5-13v5m-2.5-2.5h5"/></svg><span>扫描文件</span></button>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1 1.4 1.1-1.4 2.4-1.7-.7a8 8 0 0 1-1.5.9L16 21h-3l-.3-1.9a8 8 0 0 1-1.5-.9l-1.7.7-1.4-2.4 1.4-1.1a7 7 0 0 1 0-1.8l-1.4-1.1 1.4-2.4 1.7.7a8 8 0 0 1 1.5-.9L13 8h3l.3 1.9a8 8 0 0 1 1.5.9l1.7-.7 1.4 2.4-1.4 1.1a7 7 0 0 1-.1 1.4Z" transform="translate(-2 -2)"/></svg>
+                        <h2>优化设置</h2>
+                    </div>
+                    <div class="settings-list">
+                        <label class="check-option"><input id="pdf-compat" type="checkbox"><span class="checkmark" aria-hidden="true"></span><span>保留 PDF 兼容数据</span></label>
+                        <label class="check-option is-disabled"><input type="checkbox" checked disabled><span class="checkmark" aria-hidden="true"></span><span>保持图片为链接</span></label>
+                        <label class="check-option is-disabled"><input type="checkbox" checked disabled><span class="checkmark" aria-hidden="true"></span><span>开启 Illustrator 文件数据压缩</span></label>
+                        <label class="check-option"><input id="embed-icc" type="checkbox" checked><span class="checkmark" aria-hidden="true"></span><span>嵌入 ICC 色彩配置</span></label>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <div class="card-heading">
+                        <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h13l3 3v15H4V3Z"/><path d="M8 3v6h8V3M8 21v-8h8v8"/></svg>
+                        <h2>保存操作</h2>
+                    </div>
+                    <div class="save-actions">
+                        <button class="button button-secondary button-wide button-with-icon" type="button" data-action="compress-save"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/></svg><span>优化另存</span></button>
+                        <button class="button button-secondary button-wide button-with-icon" type="button" data-action="compress-overwrite"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h13l3 3v15H4V3Z"/><path d="M8 3v6h8V3M8 21v-8h8v8"/></svg><span>覆盖保存</span></button>
+                    </div>
+                </section>
+            </section>
+        </main>
+    </div>
+    <div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
+    <script src="./lib/CSInterface.js"></script>
+    <script src="./js/panel.js"></script>
+</body>
+</html>
