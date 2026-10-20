@@ -9,7 +9,7 @@
     var nextHostPollAt = 0;
     var polling = false;
     var invoking = false;
-    var hostVersion = "1.1.18";
+    var hostVersion = "1.1.21";
     var startup = window.LinghuiPanelStartup;
     var lastHostState = null;
     var lastBridgeError = "";

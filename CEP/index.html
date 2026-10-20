@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
-<meta name="linghui-version" content="1.1.18">
+<meta name="linghui-version" content="1.1.21">
     <title>灵绘</title>
-<link rel="stylesheet" href="./css/panel.css?v=1.1.18">
+<link rel="stylesheet" href="./css/panel.css?v=1.1.21">
 </head>
 <body>
     <div class="plugin-shell">
@@ -16,13 +16,12 @@
         </div>
 
         <nav class="tabs" role="tablist" aria-label="灵绘功能">
-            <button class="tab is-active" type="button" role="tab" aria-selected="true" aria-controls="page-size" data-page="size">尺寸</button>
-            <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-links" data-page="links">链接</button>
+            <button class="tab is-active" type="button" role="tab" aria-selected="true" aria-controls="page-size" data-page="size">尺寸与链接</button>
             <button class="tab" type="button" role="tab" aria-selected="false" aria-controls="page-compress" data-page="compress">无损压缩</button>
         </nav>
 
         <main class="page-viewport">
-            <section class="page" id="page-size" role="tabpanel" aria-label="尺寸">
+            <section class="page" id="page-size" role="tabpanel" aria-label="尺寸与链接">
                 <section class="card">
                     <div class="card-heading">
                         <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4M8 4v5m8-5v5M4 8h5m6 0h5"/></svg>
@@ -43,10 +42,6 @@
                         <button class="button button-secondary" type="button" data-action="size-both">高宽</button>
                     </div>
                 </section>
-
-            </section>
-
-            <section class="page" id="page-links" role="tabpanel" aria-label="链接" hidden>
                 <section class="card">
                     <div class="card-heading">
                         <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
@@ -59,7 +54,6 @@
                     </div>
                     <label class="check-option recursive-option"><input id="recursive-check" type="checkbox"><span class="checkmark" aria-hidden="true"></span><span>搜索子目录</span></label>
                 </section>
-
             </section>
 
             <section class="page" id="page-compress" role="tabpanel" aria-label="无损压缩" hidden>
@@ -99,9 +93,9 @@
         </main>
     </div>
     <div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
-    <script src="./js/startup.js?v=1.1.18"></script>
-    <script src="./lib/CSInterface.js?v=1.1.18"></script>
-    <script src="./js/native-picker.js?v=1.1.18"></script>
-    <script src="./js/panel.js?v=1.1.18"></script>
+    <script src="./js/startup.js?v=1.1.21"></script>
+    <script src="./lib/CSInterface.js?v=1.1.21"></script>
+    <script src="./js/native-picker.js?v=1.1.21"></script>
+    <script src="./js/panel.js?v=1.1.21"></script>
 </body>
 </html>

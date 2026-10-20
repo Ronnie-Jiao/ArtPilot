@@ -444,7 +444,7 @@
             var log = new File(cfgFolder.fsName + "/last-host-request.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.18 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
+                log.writeln(new Date().toString() + " | 1.1.21 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
                 log.close();
             }
         } catch (logError) {}
@@ -2337,7 +2337,7 @@
             var log = new File(cfgFolder.fsName + "/last-swap.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.18 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.21 | " + String(message));
                 log.close();
             }
         } catch (logError) {}
@@ -2756,7 +2756,7 @@
             var log = new File(cfgFolder.fsName + "/last-missing-repair.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.18 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.21 | " + String(message));
                 log.close();
             }
         } catch (logError) {}
@@ -4449,7 +4449,7 @@
 
         function cepState() {
             return "{" +
-                "\"version\":" + cepQuote("1.1.18") + "," +
+                "\"version\":" + cepQuote("1.1.21") + "," +
                 "\"width\":" + cepQuote(wInput.text) + "," +
                 "\"height\":" + cepQuote(hInput.text) + "," +
                 "\"unit\":" + cepQuote(unitDropdown.selection ? unitDropdown.selection.text : "mm") + "," +
@@ -4483,7 +4483,7 @@
         };
 
         $.global["LINGHUI_CEP_API"] = {
-            version: "1.1.18",
+            version: "1.1.21",
             getState: function () { return cepState(); },
             swapPictures: executeSwapTwoLinks,
             beginBatchSourceSelection: beginMissingSourceSelection,

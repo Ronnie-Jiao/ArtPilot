@@ -32,7 +32,7 @@
     --focus-ring: rgb(53 143 210 / 72%);
     --card-radius: 8px;
     --button-radius: 6px;
-    --font-body: 14px;
+    --font-body: 13px;
     --space: 12px;
     --shadow-card: 0 3px 10px rgb(0 0 0 / 15%), inset 0 1px 0 rgb(255 255 255 / 2%);
     font-family: "Microsoft YaHei UI", "Microsoft YaHei", "Segoe UI", sans-serif;
@@ -113,7 +113,7 @@ button { color: inherit; }
     border: 0;
     color: var(--muted);
     background: transparent;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 500;
     white-space: nowrap;
     cursor: pointer;
@@ -173,16 +173,16 @@ button { color: inherit; }
     overflow: hidden;
     margin: 0;
     color: var(--text);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 620;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .heading-icon {
-    flex: 0 0 22px;
-    width: 22px;
-    height: 22px;
+    flex: 0 0 20px;
+    width: 20px;
+    height: 20px;
     fill: none;
     stroke: var(--icon);
     stroke-width: 1.7;
@@ -206,7 +206,7 @@ button { color: inherit; }
     gap: 8px;
     min-width: 0;
     color: var(--muted);
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .dimension-field > span { flex: 0 0 18px; }
@@ -306,7 +306,7 @@ input[type="number"]::-webkit-inner-spin-button { opacity: .7; }
     color: var(--text);
     background: var(--button);
     box-shadow: 0 1px 3px rgb(0 0 0 / 14%), inset 0 1px 0 rgb(255 255 255 / 4%);
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 550;
     line-height: 1.2;
     text-align: center;
@@ -323,11 +323,11 @@ input[type="number"]::-webkit-inner-spin-button { opacity: .7; }
 .button-secondary:hover { background: var(--button-secondary-hover); }
 .button-primary { border-color: var(--border-hover); color: var(--button-primary-text); background: var(--button-primary); box-shadow: 0 1px 4px rgb(0 0 0 / 18%), inset 0 1px 0 rgb(255 255 255 / 7%); }
 .button-primary:hover { border-color: var(--border-primary-hover); background: var(--button-primary-hover); }
-.button-action { min-height: 68px; gap: 12px; font-weight: 600; }
-.button-action svg { flex: 0 0 25px; width: 25px; height: 25px; fill: none; stroke: var(--text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.button-action { min-height: 68px; gap: 10px; font-weight: 600; }
+.button-action svg { flex: 0 0 21px; width: 21px; height: 21px; fill: none; stroke: var(--text); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .button-action:nth-child(3) svg { stroke: var(--accent); stroke-width: 2.2; }
 .button-action span { overflow-wrap: anywhere; }
-.button-with-icon svg { flex: 0 0 20px; width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.button-with-icon svg { flex: 0 0 18px; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
 .button-small { flex: 0 0 auto; min-width: 88px; padding-inline: 10px; }
 
 .path-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; min-width: 0; }
@@ -358,7 +358,7 @@ input[type="number"]::-webkit-inner-spin-button { opacity: .7; }
 
 @media (max-width: 440px) {
     .tabs { flex-basis: 47px; gap: 0; padding-inline: 8px; }
-    .tab { flex: 1 1 0; min-width: 0; padding-inline: 5px; font-size: 14px; }
+    .tab { flex: 1 1 0; min-width: 0; padding-inline: 5px; font-size: 13px; }
     .page-viewport { padding: 11px; }
     .card { padding: 12px; }
     .button-grid-three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
