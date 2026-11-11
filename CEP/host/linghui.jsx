@@ -101,9 +101,13 @@
     hInput.characters = 8;
     hInput.helpTip = "输入目标高度；单位使用右侧菜单。";
 
-    var unitDropdown = sizeRow.add("dropdownlist", undefined, ["mm", "cm", "px", "pt", "in"]);
+    var unitRow = sizePanel.add("group");
+    unitRow.orientation = "row";
+    unitRow.alignChildren = ["fill", "center"];
+
+    var unitDropdown = unitRow.add("dropdownlist", undefined, ["mm", "cm", "px", "pt", "in"]);
     unitDropdown.selection = 0;
-    unitDropdown.preferredSize.width = 74;
+    unitDropdown.alignment = ["fill", "center"];
     unitDropdown.helpTip = "选择宽度和高度使用的单位。";
 
     var optionRow = sizePanel.add("group");
@@ -123,9 +127,9 @@
     var setHBtn = applyRow.add("button", undefined, "高度");
     var setWBtn = applyRow.add("button", undefined, "宽度");
     var setWHBtn = applyRow.add("button", undefined, "高宽");
-    setWBtn.preferredSize.width = 98;
-    setHBtn.preferredSize.width = 98;
-    setWHBtn.preferredSize.width = 98;
+    setWBtn.preferredSize.width = 78;
+    setHBtn.preferredSize.width = 78;
+    setWHBtn.preferredSize.width = 78;
     setWBtn.helpTip = "统一选中对象的宽度；勾选锁定比例时会等比缩放。";
     setHBtn.helpTip = "统一选中对象的高度；勾选锁定比例时会等比缩放。";
     setWHBtn.helpTip = "分别按输入的宽度和高度调整选中对象。";
@@ -444,7 +448,7 @@
             var log = new File(cfgFolder.fsName + "/last-host-request.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.21 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
+                log.writeln(new Date().toString() + " | 1.1.27 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
                 log.close();
             }
         } catch (logError) {}
@@ -1830,15 +1834,6 @@
             var a = pictures[0];
             var b = pictures[1];
 
-            try {
-                if (
-                    a.locked || a.hidden || a.editable === false ||
-                    b.locked || b.hidden || b.editable === false
-                ) {
-                    return "ERR|所选图片中有锁定、隐藏或不可编辑的对象。";
-                }
-            } catch (stateErr) {}
-
             var fileA = null;
             var fileB = null;
 
@@ -1846,10 +1841,30 @@
             try { fileB = b.file; } catch (eB) {}
 
             function isMissingLinkedSource(item, file) {
-                if (item.typename !== "PlacedItem") return false;
+                if (item.typename === "RasterItem") {
+                    // RasterItem can also be linked. Embedded pixels have no
+                    // external file and must not be classified as missing.
+                    try { if (item.embedded !== false) return false; }
+                    catch (embeddedError) { return false; }
+                } else if (item.typename !== "PlacedItem") {
+                    return false;
+                }
                 if (!file) return true;
                 try { return !file.exists; } catch (fileError) { return true; }
             }
+
+            var missingA = isMissingLinkedSource(a, fileA);
+            var missingB = isMissingLinkedSource(b, fileB);
+            try {
+                // A missing linked item still has a native object to swap.
+                // Do not reject it on editable alone; keep locked/hidden guards.
+                if (
+                    a.locked || a.hidden || (!missingA && a.editable === false) ||
+                    b.locked || b.hidden || (!missingB && b.editable === false)
+                ) {
+                    return "ERR|所选图片中有锁定、隐藏或不可编辑的对象。";
+                }
+            } catch (stateErr) {}
 
             function getCenter(item) {
                 try {
@@ -2070,6 +2085,9 @@
                 var box = item.boundingBox;
                 var dx = Number(box[2]) - Number(box[0]);
                 var dy = Number(box[3]) - Number(box[1]);
+                // Account for the reported mixed-type horizontal reversal;
+                // boundingBox signs alone do not establish pixel orientation.
+                if (item.typename === "RasterItem") dx = -dx;
                 var matrix = copyMatrix(item.matrix);
                 var rightX = matrix.mValueA * dx;
                 var rightY = matrix.mValueB * dx;
@@ -2128,9 +2146,8 @@
 
             function fitImageToSlot(item, source, slot) {
                 var matrix = app.getIdentityMatrix();
-                // Raster and placed images can use opposite local Y directions.
-                // Map their visible right/down axes, not the raw matrices, so
-                // crossing image types does not introduce a vertical flip.
+                // Map the image axes, including each type's local convention,
+                // to the slot axes while retaining the slot's reflections.
                 matrix.mValueA = slot.right[0] * source.xSign;
                 matrix.mValueB = slot.right[1] * source.xSign;
                 matrix.mValueC = slot.down[0] * source.ySign;
@@ -2171,25 +2188,38 @@
             }
 
             function swapImageObjects(missingLinkedSource) {
-                var stateA = imageState(a);
-                var stateB = imageState(b);
+                var stateA, stateB;
+                try { stateA = imageState(a); } catch (stateErrorA) {
+                    throw new Error("无法读取第 1 张图片" + (missingA ? "（断链）" : "") + "的图片框或变换：" + (stateErrorA.message || String(stateErrorA)));
+                }
+                try { stateB = imageState(b); } catch (stateErrorB) {
+                    throw new Error("无法读取第 2 张图片" + (missingB ? "（断链）" : "") + "的图片框或变换：" + (stateErrorB.message || String(stateErrorB)));
+                }
                 var labelA = pictureLabel(a, fileA, 1);
                 var labelB = pictureLabel(b, fileB, 2);
                 var markerA = null;
                 var markerB = null;
-                var started = false;
+                var touchedA = false;
+                var touchedB = false;
+                var stage = "建立图片位置标记";
                 try {
                     markerA = markImageSlot(a);
                     markerB = markImageSlot(b);
-                    started = true;
                     // Move the native objects. Embedded pixel data stays in the
                     // document; linked images retain their original file links.
                     // Empty markers keep each parent's clipping path and exact
                     // stacking position available for both commit and rollback.
+                    stage = "移动第 1 张图片" + (missingA ? "（断链）" : "");
+                    touchedA = true;
                     a.move(markerB, ElementPlacement.PLACEBEFORE);
+                    stage = "移动第 2 张图片" + (missingB ? "（断链）" : "");
+                    touchedB = true;
                     b.move(markerA, ElementPlacement.PLACEBEFORE);
+                    stage = "调整第 1 张图片的变换";
                     fitImageToSlot(a, stateA, stateB);
+                    stage = "调整第 2 张图片的变换";
                     fitImageToSlot(b, stateB, stateA);
+                    stage = "核对互换位置";
                     verifyImageSlot(a, stateB);
                     verifyImageSlot(b, stateA);
                     try { a.selected = true; } catch (selectAError) {}
@@ -2197,13 +2227,15 @@
                     return (missingLinkedSource ? "SWAPPED_MISSING|" : "SWAPPED|") + labelA + "|" + labelB;
                 } catch (error) {
                     var rollbackErrors = [];
-                    if (started) {
+                    if (touchedA) {
                         try {
                             a.move(markerA, ElementPlacement.PLACEBEFORE);
                             setImageMatrix(a, stateA.matrix);
                             applySlotAppearance(a, stateA);
                             verifyImageSlot(a, stateA);
                         } catch (restoreAError) { rollbackErrors.push(String(restoreAError)); }
+                    }
+                    if (touchedB) {
                         try {
                             b.move(markerB, ElementPlacement.PLACEBEFORE);
                             setImageMatrix(b, stateB.matrix);
@@ -2211,7 +2243,7 @@
                             verifyImageSlot(b, stateB);
                         } catch (restoreBError) { rollbackErrors.push(String(restoreBError)); }
                     }
-                    return "ERR|图片互换失败：" + (error.message || String(error)) +
+                    return "ERR|图片互换失败（" + stage + "）：" + (error.message || String(error)) +
                         (rollbackErrors.length ? "。恢复未完成，请按 Ctrl+Z 撤回本次操作。" : "。原图片已保留。");
                 } finally {
                     // Never delete a marker if it unexpectedly contains art.
@@ -2220,8 +2252,7 @@
                 }
             }
 
-            var hasMissingLinkedSource = isMissingLinkedSource(a, fileA) ||
-                isMissingLinkedSource(b, fileB);
+            var hasMissingLinkedSource = missingA || missingB;
             if (a.typename === "RasterItem" || b.typename === "RasterItem" || hasMissingLinkedSource) {
                 return swapImageObjects(hasMissingLinkedSource);
             }
@@ -2337,7 +2368,7 @@
             var log = new File(cfgFolder.fsName + "/last-swap.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.21 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.27 | " + String(message));
                 log.close();
             }
         } catch (logError) {}
@@ -2756,7 +2787,7 @@
             var log = new File(cfgFolder.fsName + "/last-missing-repair.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.21 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.27 | " + String(message));
                 log.close();
             }
         } catch (logError) {}
@@ -3070,7 +3101,7 @@
         if (app.documents.length < 1) return "";
 
         var doc = app.activeDocument;
-        var baseName = "Optimized.ai";
+        var baseName = "优化后.ai";
         var folder = Folder.desktop;
 
         try {
@@ -3082,11 +3113,11 @@
                 try { name = decodeURI(name); } catch (e0) {}
 
                 name = name.replace(/\.[^\.]+$/, "");
-                baseName = name + "_Optimized.ai";
+                baseName = name + "_优化后.ai";
             } else {
                 var dn = doc.name || "Untitled";
                 dn = dn.replace(/\.[^\.]+$/, "");
-                baseName = dn + "_Optimized.ai";
+                baseName = dn + "_优化后.ai";
             }
         } catch (e1) {}
 
@@ -3119,7 +3150,7 @@
 
                     defaultPath = new File(
                         originalFile.parent.fsName + "/" +
-                        baseName + "_Optimized.ai"
+                        baseName + "_优化后.ai"
                     ).fsName;
                 } else {
                     var docName = doc.name || "Untitled";
@@ -3127,12 +3158,12 @@
 
                     defaultPath = new File(
                         Folder.desktop.fsName + "/" +
-                        docName + "_Optimized.ai"
+                        docName + "_优化后.ai"
                     ).fsName;
                 }
             } catch (pathErr) {
                 defaultPath = new File(
-                    Folder.desktop.fsName + "/Optimized.ai"
+                    Folder.desktop.fsName + "/优化后.ai"
                 ).fsName;
             }
 
@@ -3166,7 +3197,7 @@
                     var b = new File(destPath).fsName.toLowerCase();
 
                     if (a === b) {
-                        return "ERR|为了保护原稿，不能直接覆盖当前 AI 文件。请使用不同文件名，例如：_Optimized.ai";
+                        return "ERR|为了保护原稿，不能直接覆盖当前 AI 文件。请使用不同文件名，例如：_优化后.ai";
                     }
                 } catch (cmpErr) {}
             }
@@ -4449,7 +4480,7 @@
 
         function cepState() {
             return "{" +
-                "\"version\":" + cepQuote("1.1.21") + "," +
+                "\"version\":" + cepQuote("1.1.27") + "," +
                 "\"width\":" + cepQuote(wInput.text) + "," +
                 "\"height\":" + cepQuote(hInput.text) + "," +
                 "\"unit\":" + cepQuote(unitDropdown.selection ? unitDropdown.selection.text : "mm") + "," +
@@ -4483,7 +4514,7 @@
         };
 
         $.global["LINGHUI_CEP_API"] = {
-            version: "1.1.21",
+            version: "1.1.27",
             getState: function () { return cepState(); },
             swapPictures: executeSwapTwoLinks,
             beginBatchSourceSelection: beginMissingSourceSelection,
@@ -4519,7 +4550,8 @@
                     // These are ordinary JavaScript handlers. Dispatch them
                     // directly; no hidden ScriptUI event is required by CEP.
                     handler.call(control);
-                    return lastHostRequestError ? "ERR|" + lastHostRequestError : "OK";
+                    if (lastHostRequestError) return "ERR|" + lastHostRequestError;
+                    return "OK";
                 } catch (invokeError) {
                     setBusy(false);
                     statusText.text = String(invokeError);

@@ -4,9 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark">
-<meta name="linghui-version" content="1.1.21">
+<meta name="linghui-version" content="1.1.27">
     <title>灵绘</title>
-<link rel="stylesheet" href="./css/panel.css?v=1.1.21">
+<link rel="stylesheet" href="./css/panel.css?v=1.1.27">
 </head>
 <body>
     <div class="plugin-shell">
@@ -30,6 +30,8 @@
                     <div class="dimension-row">
                         <label class="dimension-field"><span>W</span><input id="width-input" type="number" value="30" min="0" step="0.1" aria-label="宽度"></label>
                         <label class="dimension-field"><span>H</span><input id="height-input" type="number" value="30" min="0" step="0.1" aria-label="高度"></label>
+                    </div>
+                    <div class="unit-row">
                         <select id="unit-select" class="unit-select" aria-label="尺寸单位"><option>mm</option><option>cm</option><option>px</option><option>pt</option><option>in</option></select>
                     </div>
                     <div class="option-row">
@@ -47,13 +49,14 @@
                         <svg class="heading-icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
                         <h2>快捷操作</h2>
                     </div>
-                    <div class="button-grid button-grid-two">
+                    <div class="button-grid quick-actions">
                         <button class="button button-action" type="button" data-action="link-batch"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9l-7-6Zm0 0v6h7M8 13h8M8 17h8"/><path d="M9 1H5a2 2 0 0 0-2 2v13"/></svg><span>缺图修复</span></button>
                         <button class="button button-action" type="button" data-action="link-swap"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h13l-3-3m3 3-3 3M17 17H4l3 3m-3-3 3-3"/></svg><span>互换链接</span></button>
                         <button class="button button-action" type="button" data-action="link-pictures"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="14" height="16" rx="2"/><circle cx="12" cy="8" r="1.5"/><path d="m4 16 4-4 4 4M15 17h7m-3-3 3 3-3 3M7 21h6"/></svg><span>替换图片</span></button>
                     </div>
                     <label class="check-option recursive-option"><input id="recursive-check" type="checkbox"><span class="checkmark" aria-hidden="true"></span><span>搜索子目录</span></label>
                 </section>
+                <section id="link-repair-result" class="card result-box" role="status" aria-live="polite" hidden></section>
             </section>
 
             <section class="page" id="page-compress" role="tabpanel" aria-label="无损压缩" hidden>
@@ -93,9 +96,9 @@
         </main>
     </div>
     <div id="sr-status" class="sr-only" role="status" aria-live="polite"></div>
-    <script src="./js/startup.js?v=1.1.21"></script>
-    <script src="./lib/CSInterface.js?v=1.1.21"></script>
-    <script src="./js/native-picker.js?v=1.1.21"></script>
-    <script src="./js/panel.js?v=1.1.21"></script>
+    <script src="./js/startup.js?v=1.1.27"></script>
+    <script src="./lib/CSInterface.js?v=1.1.27"></script>
+    <script src="./js/native-picker.js?v=1.1.27"></script>
+    <script src="./js/panel.js?v=1.1.27"></script>
 </body>
 </html>

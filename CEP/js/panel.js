@@ -9,10 +9,11 @@
     var nextHostPollAt = 0;
     var polling = false;
     var invoking = false;
-    var hostVersion = "1.1.21";
+    var hostVersion = "1.1.27";
     var startup = window.LinghuiPanelStartup;
     var lastHostState = null;
     var lastBridgeError = "";
+    var awaitingMissingReport = false;
     var fieldControls = {
         width: document.getElementById("width-input"),
         height: document.getElementById("height-input"),
@@ -108,12 +109,14 @@
     }
 
     function showActionFeedback(action, message) {
-        var resultId = String(action).indexOf("compress-") === 0
-            ? "compress-result"
-            : null;
+        var resultId = action === "link-batch" ? "link-repair-result" :
+            (String(action).indexOf("compress-") === 0 ? "compress-result" : null);
         var result = resultId ? document.getElementById(resultId) : null;
         var announcement = document.getElementById("sr-status");
-        if (result) result.textContent = message;
+        if (result) {
+            result.hidden = false;
+            result.textContent = message;
+        }
         if (action === "link-batch" && result && typeof result.scrollIntoView === "function") {
             result.scrollIntoView({ block: "nearest" });
         }
@@ -171,6 +174,11 @@
         var announcement = document.getElementById("sr-status");
         if (compressResult && state.optimizeInfo) compressResult.textContent = state.optimizeInfo;
         if (announcement && state.status) announcement.textContent = state.status;
+
+        if (awaitingMissingReport && !state.busy) {
+            awaitingMissingReport = false;
+            showActionFeedback("link-batch", state.report || state.status || "Illustrator 未返回修复详情。");
+        }
 
         setActionControlsBusy(invoking || state.busy);
     }
@@ -251,6 +259,7 @@
         function finishInvocation(result) {
             invoking = false;
             setActionControlsBusy(lastHostState && lastHostState.busy);
+            if (!replacingPictures && result === "OK") awaitingMissingReport = true;
             if (typeof result === "string" && result.indexOf("ERR|") === 0) {
                 showActionFeedback(action, result.substring(4));
             } else if (result !== "OK") {

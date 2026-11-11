@@ -23,7 +23,7 @@
         $.global["LINGHUI_CEP_API"] = null;
         $.evalFile(backendFile);
         var api = $.global["LINGHUI_CEP_API"];
-        if (!api || api.version !== "1.1.21") throw new Error("Linghui host API did not initialize.");
+        if (!api || api.version !== "1.1.27") throw new Error("Linghui host API did not initialize.");
         return "OK";
     } catch (error) {
         var message = String(error && error.message ? error.message : error);
