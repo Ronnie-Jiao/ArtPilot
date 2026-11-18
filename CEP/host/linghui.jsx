@@ -33,6 +33,127 @@
     var extensionRoot = CEP_MODE ? String($.global["LINGHUI_CEP_ROOT"] || "") : "";
     var nativeBatchPickerFile = new File((extensionRoot || new File($.fileName).parent.parent.fsName) + "/native/BatchSourcePicker-1.0.4.exe");
 
+    function translateHostDialogText(value) {
+        var text = String(value === undefined || value === null ? "" : value);
+        if (!CEP_MODE || $.global["LINGHUI_CEP_LANGUAGE"] !== "en") return text;
+        var pairs = [
+            ["请先打开需要修复链接的 Illustrator 文档。", "Open the Illustrator document whose links you want to repair."],
+            ["请先打开需要优化的 Illustrator 文档。", "Open the Illustrator document you want to optimize."],
+            ["请先打开需要覆盖保存的 Illustrator 文档。", "Open the Illustrator document you want to overwrite."],
+            ["请先选择两张图片，可以是链接图片或嵌入图片。", "Select two images first. They can be linked or embedded."],
+            ["请先选择要替换的链接图片；缺失链接也可以选择。", "Select the linked images to replace first. Missing links can also be selected."],
+            ["请先在 Illustrator 中选中要替换的图片。", "Select the images to replace in Illustrator first."],
+            ["当前文档没有外部链接；嵌入图片不需要修复链接。", "The current document has no external links. Embedded images do not need relinking."],
+            ["原文档已关闭，请重新选择要替换的图片。", "The original document is closed. Select the images again."],
+            ["原选区已失效，请重新选择要替换的图片。", "The original selection is no longer available. Select the images again."],
+            ["原文档已关闭，请重新选择图片。", "The original document is closed. Select the images again."],
+            ["原选区已失效，请重新选择图片。", "The original selection is no longer available. Select the images again."],
+            ["为了保护原稿，不能直接覆盖当前 AI 文件。请使用不同文件名，例如：_优化后.ai", "To protect the original, the current AI file cannot be overwritten directly. Save with a different name, such as _optimized.ai."],
+            ["当前文档已变化，已取消覆盖保存，请重新点击“覆盖保存”。", "The document changed, so overwrite was canceled. Click Optimize & Overwrite again."],
+            ["当前文档尚未保存，请先保存文档后再使用“覆盖保存”。", "Save the current document before using Optimize & Overwrite."],
+            ["当前文档不是 AI 文件，请使用“优化另存”。", "The current document is not an AI file. Use Save Optimized Copy."],
+            ["当前 AI 文件不存在，无法覆盖保存。", "The current AI file does not exist and cannot be overwritten."],
+            ["Illustrator 未生成保存文件，请检查保存位置。", "Illustrator did not create the saved file. Check the save location."],
+            ["保存位置必须是 .ai 文件。", "The save location must be an .ai file."],
+            ["没有指定保存路径。", "No save path was specified."],
+            ["没有可用于替换的来源图片。", "No source images are available for replacement."],
+            ["没有可处理的对象。", "No eligible objects were found."],
+            ["没有对象被处理。", "No objects were processed."],
+            ["至少需要两个可处理对象。", "At least two eligible objects are required."],
+            ["请先选择一个或多个链接图片。", "Select one or more linked images first."],
+            ["请先选择一个或多个对象。", "Select one or more objects first."],
+            ["请先打开 Illustrator 文档。", "Open an Illustrator document first."],
+            ["当前选择中没有可替换的链接图片。", "The current selection has no replaceable linked images."],
+            ["当前选择中没有成功替换的链接图片。", "No selected linked images were replaced."],
+            ["无法读取所选新图片的原始宽高比。", "Could not read the original aspect ratio of the selected image."],
+            ["所选替换文件不存在。", "The selected replacement file does not exist."],
+            ["没有完成所选图片的替换。", "The selected image was not replaced."],
+            ["所选图片中有锁定、隐藏或不可编辑的对象。", "The selection contains locked, hidden, or non-editable objects."],
+            ["图片互换失败（", "Image swap failed ("],
+            ["直接移动失败（", "Direct move failed ("],
+            ["）；保留原嵌入/链接状态的图片副本也无法放入目标位置（", "); a copy preserving its linked or embedded state also could not be placed at the target ("],
+            ["互换图片准备失败：", "Could not prepare the image swap: "],
+            ["互换图片提交失败：", "Could not apply the image swap: "],
+            ["无法读取其中一张图片的链接路径。", "Could not read the link path for one of the images."],
+            ["其中一张图片的原链接文件已经丢失。", "The original linked file for one of the images is missing."],
+            ["无法读取两张图片的当前高度。", "Could not read the current height of both images."],
+            ["无法读取其中一张原图片的自然宽高比。", "Could not read the original aspect ratio of one of the images."],
+            ["缺图修复失败：", "Missing-link repair failed: "],
+            ["搜索路径不存在或无法访问：", "The search path does not exist or is inaccessible: "],
+            ["没有取得可用的文件夹或图片，请重新选择。", "No usable folder or images were selected. Choose them again."],
+            ["当前文档尚未保存，请使用“优化另存”。", "The current document has not been saved. Use Save Optimized Copy."],
+            ["当前文档没有外部链接；嵌入图片请使用“替换图片”。", "The current document has no external links. Use Replace Images for embedded images."],
+            ["宽度 ", "Width "], ["高度 ", "Height "], ["高宽 ", "Width & Height "],
+            ["请输入大于 0 的有效尺寸。", "Enter a valid size greater than zero."],
+            ["尺寸过大。", "The size is too large."],
+            ["未知尺寸操作。", "Unknown resize operation."],
+            ["未知优化操作。", "Unknown optimization operation."],
+            ["脚本执行失败：", "Script failed:"],
+            ["没有选择可用于替换的图片。", "No replacement images were selected."],
+            ["批量替换失败：", "Batch Replace failed: "],
+            ["替换图片失败：", "Replace Images failed: "],
+            ["批量替换", "Batch Replace"], ["替换图片", "Replace Images"],
+            ["已执行。", " completed."], ["成功替换：", "Successfully replaced: "],
+            ["个来源路径无法访问。", " source path(s) could not be accessed."],
+            ["另外有 ", "Additionally, "], ["有 ", "There are "], [" 张替换失败。", " image(s) could not be replaced."],
+            ["照片选少了，图片数量不足。", "Too few photos were selected."],
+            ["选中了 ", "Selected "], [" 张图片，", " image(s), "], ["来源只有 ", "the source contains only "],
+            ["实际替换了 ", "Replaced "], ["末尾 ", "The last "], [" 张保持不变。", " image(s) were left unchanged."],
+            ["完成，但有部分图片替换失败。", " completed with some image replacements failing."],
+            ["成功：", "Succeeded: "], ["失败：", "Failed: "],
+            ["无法取得当前文件位置：", "Could not get the current file location:"],
+            ["无法取得保存位置：", "Could not get the save location:"],
+            ["没有取得当前文件位置。", "No current file location was returned."],
+            ["没有取得保存位置。", "No save location was returned."],
+            ["没有选择保存位置。", "No save location was selected."],
+            ["已取消覆盖保存。", "Overwrite canceled."],
+            ["读取当前文件位置失败：", "Could not read the current file location:"],
+            ["打开 Illustrator 另存为窗口失败：", "Could not open the Illustrator Save As dialog:"],
+            ["无法创建临时选择器脚本。", "Could not create the temporary picker script."],
+            ["创建现代选择器失败：", "Could not create the modern file picker:"],
+            ["调用 Windows 现代选择器失败：", "Could not call the modern Windows file picker:"],
+            ["找不到 Windows 原生选择窗口，请重新安装灵绘扩展。", "The native Windows file picker was not found. Reinstall the Linghui extension."],
+            ["无法准备 Windows 选择窗口。", "Could not prepare the Windows file picker."],
+            ["无法创建选择窗口请求。", "Could not create the file picker request."],
+            ["无法打开 Windows 选择窗口。", "Could not open the Windows file picker."],
+            ["Windows 选择窗口未返回结果。", "The Windows file picker returned no result."],
+            ["无法读取选择结果。", "Could not read the file picker result."],
+            ["Windows 选择窗口执行失败。", "The Windows file picker failed."],
+            ["无法定位当前 Illustrator 会话。", "Could not locate the current Illustrator session."],
+            ["缺图修复请求发送失败，请重试。", "Could not send the missing-link repair request. Try again."],
+            ["无法读取新图片原始比例", "Could not read the original image aspect ratio"],
+            ["原图片变换无效，无法重新链接", "The original image transform is invalid and cannot be relinked"],
+            ["无法计算重新链接后的图片尺寸", "Could not calculate the relinked image dimensions"],
+            ["计算新图片尺寸失败", "Could not calculate the new image dimensions"],
+            ["无法复制原图片对象", "Could not duplicate the original image object"],
+            ["对象不可编辑", "The object is not editable"],
+            ["无法读取原高度", "Could not read the original height"],
+            ["原链接恢复失败", "Could not restore the original link"],
+            ["原变换恢复失败", "Could not restore the original transform"],
+            ["图片变换不可逆，无法互换", "The image transform cannot be reversed, so the images cannot be swapped"],
+            ["无法读取图片的原始尺寸或变换", "Could not read the original image dimensions or transform"],
+            ["图片变换已经退化，无法互换", "The image transform is degenerate, so the images cannot be swapped"],
+            ["互换后的图片高度无效", "The swapped image height is invalid"],
+            ["无法计算图片缩放比例", "Could not calculate the image scale"],
+            ["无法定位互换后的图片", "Could not position the swapped image"],
+            ["图片没有到达互换后的目标位置", "The image did not reach its swapped position"],
+            ["将按当前无损优化设置覆盖保存当前 AI 文件：", "The current AI file will be overwritten using the current lossless optimization settings:"],
+            ["覆盖后原文件将被替换，是否继续？", "The original file will be replaced. Continue?"]
+        ];
+        for (var i = 0; i < pairs.length; i++) {
+            if (text.indexOf(pairs[i][0]) !== -1) text = text.split(pairs[i][0]).join(pairs[i][1]);
+        }
+        return text;
+    }
+
+    function showHostAlert(message) {
+        alert(translateHostDialogText(message));
+    }
+
+    function showHostConfirm(message) {
+        return confirm(translateHostDialogText(message));
+    }
+
     // 每次重新运行脚本时都重建面板。
     // 这样以后只需要用同名 灵绘.jsx 覆盖旧文件，再运行一次即可刷新。
     try {
@@ -101,13 +222,9 @@
     hInput.characters = 8;
     hInput.helpTip = "输入目标高度；单位使用右侧菜单。";
 
-    var unitRow = sizePanel.add("group");
-    unitRow.orientation = "row";
-    unitRow.alignChildren = ["fill", "center"];
-
-    var unitDropdown = unitRow.add("dropdownlist", undefined, ["mm", "cm", "px", "pt", "in"]);
+    var unitDropdown = sizeRow.add("dropdownlist", undefined, ["mm", "cm", "px", "pt", "in"]);
     unitDropdown.selection = 0;
-    unitDropdown.alignment = ["fill", "center"];
+    unitDropdown.preferredSize.width = 64;
     unitDropdown.helpTip = "选择宽度和高度使用的单位。";
 
     var optionRow = sizePanel.add("group");
@@ -400,7 +517,7 @@
         var n = parseFloat(String(input.text).replace(",", "."));
 
         if (isNaN(n) || n <= 0) {
-            alert(label + " 请输入大于 0 的有效尺寸。");
+            showHostAlert(label + " 请输入大于 0 的有效尺寸。");
             return null;
         }
 
@@ -409,7 +526,7 @@
 
         // Illustrator PageItem 尺寸上限附近
         if (pt > 16348) {
-            alert(label + " 尺寸过大。");
+            showHostAlert(label + " 尺寸过大。");
             return null;
         }
 
@@ -448,7 +565,7 @@
             var log = new File(cfgFolder.fsName + "/last-host-request.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.27 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
+                log.writeln(new Date().toString() + " | 1.1.33 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
                 log.close();
             }
         } catch (logError) {}
@@ -688,7 +805,7 @@
         bt.onError = function (err) {
             setBusy(false);
             statusText.text = "尺寸操作失败。";
-            alert("脚本执行失败：\n" + err.body);
+            showHostAlert("脚本执行失败：\n" + err.body);
         };
 
         bt.send();
@@ -1062,7 +1179,7 @@
         bt.onError = function (err) {
             setBusy(false);
             statusText.text = "统一替换链接失败。";
-            alert("脚本执行失败：\n" + err.body);
+            showHostAlert("脚本执行失败：\n" + err.body);
         };
 
         bt.send();
@@ -1648,7 +1765,7 @@
                 try { delete $.global[selectionKey]; } catch (releaseErr) {}
             }
             setBusy(false);
-            alert("没有选择可用于替换的图片。");
+            showHostAlert("没有选择可用于替换的图片。");
             return;
         }
 
@@ -1680,7 +1797,7 @@
                 var msg = p.slice(1).join("|");
                 statusText.text = msg;
                 reportBox.text = msg;
-                alert(msg);
+                showHostAlert(msg);
                 return;
             }
 
@@ -1710,7 +1827,7 @@
                 (errorText ? "\n" + errorText : "");
 
             if (invalidSources > 0 && replaced > 0) {
-                alert(
+                showHostAlert(
                     actionName + "已执行。\n\n" +
                     "成功替换：" + replaced + " 张\n" +
                     "有 " + invalidSources + " 个来源路径无法访问。" +
@@ -1724,7 +1841,7 @@
             }
 
             if (shortage > 0) {
-                alert(
+                showHostAlert(
                     "照片选少了，图片数量不足。\n\n" +
                     "选中了 " + selectedCount + " 张图片，" +
                     "来源只有 " + sourceCount + " 张。\n\n" +
@@ -1739,7 +1856,7 @@
             }
 
             if (failed > 0) {
-                alert(
+                showHostAlert(
                     actionName + "完成，但有部分图片替换失败。\n\n" +
                     "成功：" + replaced + " 张\n" +
                     "失败：" + failed + " 张" +
@@ -1763,7 +1880,7 @@
             setBusy(false);
             statusText.text = actionName + "失败。";
             reportBox.text = statusText.text + "\n" + String(err.body || err);
-            alert(
+            showHostAlert(
                 actionName + "失败：\n" +
                 String(err.body || err)
             );
@@ -2144,6 +2261,37 @@
                 }
             }
 
+            function moveImageToSlot(item, marker) {
+                var targetParent = marker.parent;
+                try {
+                    item.move(marker, ElementPlacement.PLACEBEFORE);
+                    return item;
+                } catch (moveError) {
+                    try {
+                        if (item.parent === targetParent) return item;
+                    } catch (parentCheckError) {}
+
+                    var copy = null;
+                    try {
+                        // duplicate() preserves the item's native kind: linked
+                        // PlacedItems remain linked and embedded RasterItems
+                        // keep their pixels embedded in the document.
+                        copy = item.duplicate(marker, ElementPlacement.PLACEBEFORE);
+                        if (!copy) throw new Error("没有生成图片副本");
+                        if (copy.parent !== targetParent) throw new Error("图片副本没有进入目标位置");
+                        item.remove();
+                        return copy;
+                    } catch (copyError) {
+                        try { if (copy) copy.remove(); } catch (cleanupError) {}
+                        throw new Error(
+                            "直接移动失败（" + (moveError.message || String(moveError)) +
+                            "）；保留原嵌入/链接状态的图片副本也无法放入目标位置（" +
+                            (copyError.message || String(copyError)) + "）"
+                        );
+                    }
+                }
+            }
+
             function fitImageToSlot(item, source, slot) {
                 var matrix = app.getIdentityMatrix();
                 // Map the image axes, including each type's local convention,
@@ -2211,10 +2359,10 @@
                     // stacking position available for both commit and rollback.
                     stage = "移动第 1 张图片" + (missingA ? "（断链）" : "");
                     touchedA = true;
-                    a.move(markerB, ElementPlacement.PLACEBEFORE);
+                    a = moveImageToSlot(a, markerB);
                     stage = "移动第 2 张图片" + (missingB ? "（断链）" : "");
                     touchedB = true;
-                    b.move(markerA, ElementPlacement.PLACEBEFORE);
+                    b = moveImageToSlot(b, markerA);
                     stage = "调整第 1 张图片的变换";
                     fitImageToSlot(a, stateA, stateB);
                     stage = "调整第 2 张图片的变换";
@@ -2229,7 +2377,7 @@
                     var rollbackErrors = [];
                     if (touchedA) {
                         try {
-                            a.move(markerA, ElementPlacement.PLACEBEFORE);
+                            a = moveImageToSlot(a, markerA);
                             setImageMatrix(a, stateA.matrix);
                             applySlotAppearance(a, stateA);
                             verifyImageSlot(a, stateA);
@@ -2237,7 +2385,7 @@
                     }
                     if (touchedB) {
                         try {
-                            b.move(markerB, ElementPlacement.PLACEBEFORE);
+                            b = moveImageToSlot(b, markerB);
                             setImageMatrix(b, stateB.matrix);
                             applySlotAppearance(b, stateB);
                             verifyImageSlot(b, stateB);
@@ -2368,7 +2516,7 @@
             var log = new File(cfgFolder.fsName + "/last-swap.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.27 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.33 | " + String(message));
                 log.close();
             }
         } catch (logError) {}
@@ -2391,7 +2539,7 @@
         }
         reportBox.text = statusText.text;
         recordSwapStatus(result);
-        if (showAlert && result.indexOf("ERR|") === 0) alert(statusText.text);
+        if (showAlert && result.indexOf("ERR|") === 0) showHostAlert(statusText.text);
         return result;
     }
 
@@ -2787,7 +2935,7 @@
             var log = new File(cfgFolder.fsName + "/last-missing-repair.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.27 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.33 | " + String(message));
                 log.close();
             }
         } catch (logError) {}
@@ -3252,13 +3400,13 @@
             if (p[0] === "ERR") {
                 var msg = p.slice(1).join("|");
                 statusText.text = msg;
-                alert(msg);
+                showHostAlert(msg);
                 return;
             }
 
             if (p[0] !== "DEST") {
                 statusText.text = "无法取得当前文件位置。";
-                alert("无法取得当前文件位置：\n" + result);
+                showHostAlert("无法取得当前文件位置：\n" + result);
                 return;
             }
 
@@ -3273,7 +3421,7 @@
 
         bt.onError = function (err) {
             statusText.text = "读取当前文件位置失败。";
-            alert(
+            showHostAlert(
                 "读取当前文件位置失败：\n" +
                 String(err.body || err)
             );
@@ -3301,13 +3449,13 @@
             if (p[0] === "ERR") {
                 var msg = p.slice(1).join("|");
                 statusText.text = msg;
-                alert(msg);
+                showHostAlert(msg);
                 return;
             }
 
             if (p[0] !== "DEST") {
                 statusText.text = "无法取得保存位置。";
-                alert("无法取得保存位置：\n" + result);
+                showHostAlert("无法取得保存位置：\n" + result);
                 return;
             }
 
@@ -3323,7 +3471,7 @@
 
         bt.onError = function (err) {
             statusText.text = "打开另存为窗口失败。";
-            alert(
+            showHostAlert(
                 "打开 Illustrator 另存为窗口失败：\n" +
                 String(err.body || err)
             );
@@ -3789,7 +3937,7 @@
             psFile.encoding = "UTF-8";
 
             if (!psFile.open("w")) {
-                alert("无法创建临时选择器脚本。");
+                showHostAlert("无法创建临时选择器脚本。");
                 return "";
             }
 
@@ -3801,7 +3949,7 @@
                 if (psFile.opened) psFile.close();
             } catch (ignore1) {}
 
-            alert("创建现代选择器失败：\n" + writeErr.message);
+            showHostAlert("创建现代选择器失败：\n" + writeErr.message);
             return "";
         }
 
@@ -3816,7 +3964,7 @@
             output = system.callSystem(cmd);
         } catch (callErr) {
             try { psFile.remove(); } catch (ignore2) {}
-            alert("调用 Windows 现代选择器失败：\n" + callErr.message);
+            showHostAlert("调用 Windows 现代选择器失败：\n" + callErr.message);
             return "";
         }
 
@@ -4432,7 +4580,7 @@
 
     optimizeOverwriteBtn.onClick = function () {
         requestOverwriteDestination(function (path) {
-            var ok = confirm(
+            var ok = showHostConfirm(
                 "将按当前无损优化设置覆盖保存当前 AI 文件：\n\n" +
                 path +
                 "\n\n覆盖后原文件将被替换，是否继续？"
@@ -4480,7 +4628,7 @@
 
         function cepState() {
             return "{" +
-                "\"version\":" + cepQuote("1.1.27") + "," +
+                "\"version\":" + cepQuote("1.1.33") + "," +
                 "\"width\":" + cepQuote(wInput.text) + "," +
                 "\"height\":" + cepQuote(hInput.text) + "," +
                 "\"unit\":" + cepQuote(unitDropdown.selection ? unitDropdown.selection.text : "mm") + "," +
@@ -4514,7 +4662,7 @@
         };
 
         $.global["LINGHUI_CEP_API"] = {
-            version: "1.1.27",
+            version: "1.1.33",
             getState: function () { return cepState(); },
             swapPictures: executeSwapTwoLinks,
             beginBatchSourceSelection: beginMissingSourceSelection,

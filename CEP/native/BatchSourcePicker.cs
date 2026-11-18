@@ -28,6 +28,7 @@ namespace ArtPilot
             try
             {
                 string initial;
+                bool english = args.Length >= 3 && String.Equals(args[2], "en", StringComparison.OrdinalIgnoreCase);
                 if (args.Length >= 2)
                 {
                     output = args[0];
@@ -37,12 +38,12 @@ namespace ArtPilot
                 {
                     string request = Assembly.GetExecutingAssembly().Location + ".request.txt";
                     string[] lines = File.ReadAllLines(request, Encoding.UTF8);
-                    if (lines.Length < 2) throw new InvalidDataException("选择窗口请求不完整。");
+                    if (lines.Length < 2) throw new InvalidDataException(english ? "The file picker request is incomplete." : "选择窗口请求不完整。");
                     output = lines[0];
                     initial = lines[1];
                 }
 
-                List<string> selected = Pick(initial);
+                List<string> selected = Pick(initial, english);
                 WriteResult(output, selected == null ? "cancel" : "ok", selected);
                 return 0;
             }
@@ -92,7 +93,7 @@ namespace ArtPilot
             File.Move(temporary, output);
         }
 
-        private static List<string> Pick(string initial)
+        private static List<string> Pick(string initial, bool english)
         {
             IFileOpenDialog dialog = (IFileOpenDialog)new FileOpenDialog();
             SelectionEvents events = new SelectionEvents(dialog);
@@ -104,13 +105,13 @@ namespace ArtPilot
                 // Native navigation remains available; folders are accepted by
                 // the native custom control without entering FOS_PICKFOLDERS mode.
                 dialog.SetOptions(options | 0x40 | 0x200 | 0x800 | 0x1000 | 0x8 | 0x02000000);
-                dialog.SetTitle("选择文件夹或图片");
-                dialog.SetOkButtonLabel("打开");
-                dialog.SetFileNameLabel("文件夹或图片");
+                dialog.SetTitle(english ? "Select Folders or Images" : "选择文件夹或图片");
+                dialog.SetOkButtonLabel(english ? "Open" : "打开");
+                dialog.SetFileNameLabel(english ? "Folder or image" : "文件夹或图片");
                 Guid clientId = ClientId;
                 dialog.SetClientGuid(ref clientId);
                 FilterSpec[] filters = {
-                    new FilterSpec { Name = "图片及可置入文件", Spec = "*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp;*.gif;*.webp;*.pdf;*.ai;*.eps" }
+                    new FilterSpec { Name = english ? "Images and Placeable Files" : "图片及可置入文件", Spec = "*.jpg;*.jpeg;*.png;*.tif;*.tiff;*.psd;*.bmp;*.gif;*.webp;*.pdf;*.ai;*.eps" }
                 };
                 dialog.SetFileTypes((uint)filters.Length, filters);
 
@@ -129,7 +130,7 @@ namespace ArtPilot
                 }
 
                 IFileDialogCustomize customize = (IFileDialogCustomize)dialog;
-                customize.AddPushButton(SelectControl, "选择");
+                customize.AddPushButton(SelectControl, english ? "Select" : "选择");
                 customize.MakeProminent(SelectControl);
                 dialog.Advise(events, out cookie);
                 int result = dialog.Show(IllustratorOwner());
@@ -140,7 +141,9 @@ namespace ArtPilot
                 // folders before Close(), where GetResults() is unavailable.
                 List<string> accepted = events.Paths;
                 if (accepted == null || accepted.Count == 0) accepted = ConfirmedFiles(dialog);
-                if (accepted.Count == 0) throw new InvalidDataException("没有取得已确认的图片，请重新选择。");
+                if (accepted.Count == 0) throw new InvalidDataException(english
+                    ? "No confirmed images were selected. Please select again."
+                    : "没有取得已确认的图片，请重新选择。");
                 return accepted;
             }
             finally

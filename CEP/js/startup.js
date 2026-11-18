@@ -6,6 +6,12 @@
     var retry = document.getElementById("connection-retry");
     var retryHandler = null;
     var watchdog = null;
+    var lastText = "";
+    var i18n = window.ArtPilotI18n;
+
+    function localize(text) {
+        return i18n ? i18n.translateMessage(text) : text;
+    }
 
     function clearWatchdog() {
         if (watchdog !== null) window.clearTimeout(watchdog);
@@ -13,8 +19,10 @@
     }
 
     function show(text, allowRetry) {
+        lastText = String(text || "");
         status.hidden = false;
-        message.textContent = text;
+        message.setAttribute("data-linghui-source", lastText);
+        message.textContent = localize(lastText);
         retry.hidden = !allowRetry;
     }
 
@@ -58,6 +66,13 @@
         },
         onRetry: function (handler) { retryHandler = handler; }
     };
+
+    window.addEventListener("linghui-language-change", function () {
+        if (!status.hidden) {
+            message.setAttribute("data-linghui-source", lastText);
+            message.textContent = localize(lastText);
+        }
+    });
 
     connecting();
 }());

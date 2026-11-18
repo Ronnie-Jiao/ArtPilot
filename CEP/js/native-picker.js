@@ -1,6 +1,12 @@
 (function () {
     "use strict";
 
+    var i18n = window.ArtPilotI18n;
+
+    function translated(key, fallback) {
+        return i18n ? i18n.t(key) : fallback;
+    }
+
     window.LinghuiNativePathPicker = function (chooseDirectory, initialPath) {
         var fileSystem = window.cep && window.cep.fs;
         if (!fileSystem) {
@@ -23,13 +29,14 @@
                 if (!directory) initial = initial.substring(0, initial.lastIndexOf("/") + 1);
             }
         }
-        var title = chooseDirectory ? "选择文件夹" : "选择文件";
+        var title = chooseDirectory ? translated("chooseFolder", "选择文件夹") : translated("chooseFile", "选择文件");
         var result;
         // The CEP filesystem API opens the OS dialog directly, without a
         // BridgeTalk application target. Adobe CEP 12 documents both methods.
         if (typeof fileSystem.showOpenDialogEx === "function") {
             result = fileSystem.showOpenDialogEx(false, !!chooseDirectory, title, initial,
-                chooseDirectory ? [] : ["*"], "所有文件", chooseDirectory ? "选择文件夹" : "选择");
+                chooseDirectory ? [] : ["*"], translated("allFiles", "所有文件"),
+                chooseDirectory ? translated("chooseFolder", "选择文件夹") : translated("select", "选择"));
         } else if (typeof fileSystem.showOpenDialog === "function") {
             result = fileSystem.showOpenDialog(false, !!chooseDirectory, title, initial,
                 chooseDirectory ? [] : ["*"]);
@@ -69,7 +76,8 @@
             callback({ status: "error", message: "选择窗口的结果目录不可用。" });
             return;
         }
-        var launched = native.process.createProcess(executable, resultPath, initialPath || "");
+        var language = i18n ? i18n.getLanguage() : "zh";
+        var launched = native.process.createProcess(executable, resultPath, initialPath || "", language);
         if (launched.err !== 0 || !launched.data) {
             callback({ status: "error", message: "无法打开 Windows 选择窗口（" + launched.err + "）。" });
             return;

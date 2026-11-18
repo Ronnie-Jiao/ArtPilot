@@ -2,7 +2,7 @@
 #targetengine "AI_MERGED_TOOLBOX"
 
 /*
-    灵绘 独立脚本 1.1.18
+    灵绘 独立脚本 1.1.19
     合并自：
     1) 自动恢复缺失链接 v5
     2) AI 统一尺寸面板
@@ -54,7 +54,7 @@
     // ---------------------------------------------------------
     // 主窗口
     // ---------------------------------------------------------
-    var win = new Window("palette", "灵绘 1.1.18", undefined, {
+    var win = new Window("palette", "灵绘", undefined, {
         resizeable: true,
         closeButton: true
     });
@@ -446,7 +446,7 @@
             var log = new File(cfgFolder.fsName + "/last-host-request.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.18 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
+                log.writeln(new Date().toString() + " | 1.1.19 | " + (CEP_MODE ? "CEP" : "ScriptUI") + " | " + message);
                 log.close();
             }
         } catch (logError) {}
@@ -2142,6 +2142,37 @@
                 }
             }
 
+            function moveImageToSlot(item, marker) {
+                var targetParent = marker.parent;
+                try {
+                    item.move(marker, ElementPlacement.PLACEBEFORE);
+                    return item;
+                } catch (moveError) {
+                    try {
+                        if (item.parent === targetParent) return item;
+                    } catch (parentCheckError) {}
+
+                    var copy = null;
+                    try {
+                        // duplicate() preserves the item's native kind: linked
+                        // PlacedItems remain linked and embedded RasterItems
+                        // keep their pixels embedded in the document.
+                        copy = item.duplicate(marker, ElementPlacement.PLACEBEFORE);
+                        if (!copy) throw new Error("没有生成图片副本");
+                        if (copy.parent !== targetParent) throw new Error("图片副本没有进入目标位置");
+                        item.remove();
+                        return copy;
+                    } catch (copyError) {
+                        try { if (copy) copy.remove(); } catch (cleanupError) {}
+                        throw new Error(
+                            "直接移动失败（" + (moveError.message || String(moveError)) +
+                            "）；保留原嵌入/链接状态的图片副本也无法放入目标位置（" +
+                            (copyError.message || String(copyError)) + "）"
+                        );
+                    }
+                }
+            }
+
             function fitImageToSlot(item, source, slot) {
                 var matrix = app.getIdentityMatrix();
                 // Map the image axes, including each type's local convention,
@@ -2209,10 +2240,10 @@
                     // stacking position available for both commit and rollback.
                     stage = "移动第 1 张图片" + (missingA ? "（断链）" : "");
                     touchedA = true;
-                    a.move(markerB, ElementPlacement.PLACEBEFORE);
+                    a = moveImageToSlot(a, markerB);
                     stage = "移动第 2 张图片" + (missingB ? "（断链）" : "");
                     touchedB = true;
-                    b.move(markerA, ElementPlacement.PLACEBEFORE);
+                    b = moveImageToSlot(b, markerA);
                     stage = "调整第 1 张图片的变换";
                     fitImageToSlot(a, stateA, stateB);
                     stage = "调整第 2 张图片的变换";
@@ -2227,7 +2258,7 @@
                     var rollbackErrors = [];
                     if (touchedA) {
                         try {
-                            a.move(markerA, ElementPlacement.PLACEBEFORE);
+                            a = moveImageToSlot(a, markerA);
                             setImageMatrix(a, stateA.matrix);
                             applySlotAppearance(a, stateA);
                             verifyImageSlot(a, stateA);
@@ -2235,7 +2266,7 @@
                     }
                     if (touchedB) {
                         try {
-                            b.move(markerB, ElementPlacement.PLACEBEFORE);
+                            b = moveImageToSlot(b, markerB);
                             setImageMatrix(b, stateB.matrix);
                             applySlotAppearance(b, stateB);
                             verifyImageSlot(b, stateB);
@@ -2366,7 +2397,7 @@
             var log = new File(cfgFolder.fsName + "/last-swap.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.18 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.19 | " + String(message));
                 log.close();
             }
         } catch (logError) {}
@@ -2785,7 +2816,7 @@
             var log = new File(cfgFolder.fsName + "/last-missing-repair.txt");
             log.encoding = "UTF-8";
             if (log.open("w")) {
-                log.writeln(new Date().toString() + " | 1.1.18 | " + String(message));
+                log.writeln(new Date().toString() + " | 1.1.19 | " + String(message));
                 log.close();
             }
         } catch (logError) {}

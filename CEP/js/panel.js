@@ -9,8 +9,11 @@
     var nextHostPollAt = 0;
     var polling = false;
     var invoking = false;
-    var hostVersion = "1.1.27";
+    var hostVersion = "1.1.33";
+    var updateChecking = false;
+    var updateManifestUrl = "https://api.spotcue.cekoro.cn/linghui-updates/latest.json";
     var startup = window.LinghuiPanelStartup;
+    var i18n = window.ArtPilotI18n;
     var lastHostState = null;
     var lastBridgeError = "";
     var awaitingMissingReport = false;
@@ -24,6 +27,17 @@
         pdfCompat: document.getElementById("pdf-compat"),
         icc: document.getElementById("embed-icc")
     };
+
+    function localizedText(element, source) {
+        if (!element) return;
+        source = String(source === undefined || source === null ? "" : source);
+        element.setAttribute("data-linghui-source", source);
+        element.textContent = i18n ? i18n.translateMessage(source) : source;
+    }
+
+    function translated(key) {
+        return i18n ? i18n.t(key) : key;
+    }
 
     function activateTab(tab, moveFocus) {
         var pageName = tab.getAttribute("data-page");
@@ -53,6 +67,19 @@
             activateTab(tabs[nextIndex], true);
         });
     });
+
+    var authorGithubLink = document.getElementById("author-github-link");
+    if (authorGithubLink) {
+        authorGithubLink.addEventListener("click", function (event) {
+            if (typeof CSInterface === "undefined" || !window.__adobe_cep__) return;
+            event.preventDefault();
+            try {
+                (cs || new CSInterface()).openURLInDefaultBrowser(authorGithubLink.href);
+            } catch (error) {
+                window.open(authorGithubLink.href, "_blank", "noopener");
+            }
+        });
+    }
 
     function extendScriptString(value) {
         return "\"" + String(value)
@@ -84,7 +111,13 @@
         // Keep the preprocessor directive on its own line. Bridge exceptions
         // must complete the request too, otherwise polling stays locked forever.
         try {
-            cs.evalScript('#targetengine "AI_MERGED_TOOLBOX"\n' + expression, complete);
+            var language = i18n ? i18n.getLanguage() : "zh";
+            cs.evalScript(
+                '#targetengine "AI_MERGED_TOOLBOX"\n' +
+                '$.global["LINGHUI_CEP_LANGUAGE"]=' + extendScriptString(language) + ';\n' +
+                expression,
+                complete
+            );
         } catch (error) {
             complete("CEP_BRIDGE_ERROR|" + String(error));
         }
@@ -109,18 +142,14 @@
     }
 
     function showActionFeedback(action, message) {
-        var resultId = action === "link-batch" ? "link-repair-result" :
-            (String(action).indexOf("compress-") === 0 ? "compress-result" : null);
+        var resultId = String(action).indexOf("compress-") === 0 ? "compress-result" : null;
         var result = resultId ? document.getElementById(resultId) : null;
         var announcement = document.getElementById("sr-status");
         if (result) {
             result.hidden = false;
-            result.textContent = message;
+            localizedText(result, message);
         }
-        if (action === "link-batch" && result && typeof result.scrollIntoView === "function") {
-            result.scrollIntoView({ block: "nearest" });
-        }
-        if (announcement) announcement.textContent = message;
+        localizedText(announcement, message);
     }
 
     function setHostField(name, value) {
@@ -154,7 +183,10 @@
 
     function setActionControlsBusy(busy) {
         document.querySelectorAll("[data-action]").forEach(function (button) {
-            if (button.dataset.action !== "close") button.disabled = !!busy;
+            if (button.dataset.action !== "close" && button.dataset.action !== "check-updates" &&
+                    button.dataset.action !== "toggle-language") {
+                button.disabled = !!busy;
+            }
         });
     }
 
@@ -172,8 +204,8 @@
 
         var compressResult = document.getElementById("compress-result");
         var announcement = document.getElementById("sr-status");
-        if (compressResult && state.optimizeInfo) compressResult.textContent = state.optimizeInfo;
-        if (announcement && state.status) announcement.textContent = state.status;
+        if (compressResult && state.optimizeInfo) localizedText(compressResult, state.optimizeInfo);
+        if (announcement && state.status) localizedText(announcement, state.status);
 
         if (awaitingMissingReport && !state.busy) {
             awaitingMissingReport = false;
@@ -254,7 +286,8 @@
         var recursive = !!fieldControls.recursive.checked;
         invoking = true;
         setActionControlsBusy(true);
-        showActionFeedback(action, "正在打开 Windows 选择窗口…");
+        var announcement = document.getElementById("sr-status");
+        localizedText(announcement, "正在打开 Windows 选择窗口…");
 
         function finishInvocation(result) {
             invoking = false;
@@ -314,13 +347,13 @@
         showActionFeedback(action, "正在执行…");
         var swapping = action === "link-swap";
         var swapLabel = swapping ? document.querySelector('[data-action="link-swap"] span') : null;
-        if (swapLabel) swapLabel.textContent = "正在互换…";
+        if (swapLabel) swapLabel.textContent = translated("swapping");
         var expression = withCurrentFields(swapping
             ? 'api.swapPictures()'
             : 'api.invoke(' + extendScriptString(action) + ')');
         evalHost(expression, function (result) {
             invoking = false;
-            if (swapLabel) swapLabel.textContent = "互换链接";
+            if (swapLabel) swapLabel.textContent = translated("swapLinks");
             setActionControlsBusy(lastHostState && lastHostState.busy);
             if (result === "EvalScript error." || result === "CEP_TIMEOUT" || result === "CEP_NOT_READY" ||
                     (typeof result === "string" && result.indexOf("CEP_BRIDGE_ERROR|") === 0)) {
@@ -338,11 +371,15 @@
             if (swapping) {
                 if (typeof result === "string" && result.indexOf("SWAPPED_MISSING|") === 0) {
                     var missingNames = result.split("|");
-                    showActionFeedback(action, "互换完成（含缺图）：" + missingNames[1] + " ⇄ " + missingNames[2] +
+                    showActionFeedback(action, i18n ? i18n.format("swapMissingComplete", {
+                        first: missingNames[1], second: missingNames[2]
+                    }) : "互换完成（含缺图）：" + missingNames[1] + " ⇄ " + missingNames[2] +
                         "；正常图片已移至缺图位置，缺失链接仍需修复；可按 Ctrl+Z 撤回。");
                 } else if (typeof result === "string" && result.indexOf("SWAPPED|") === 0) {
                     var names = result.split("|");
-                    showActionFeedback(action, "互换完成：" + names[1] + " ⇄ " + names[2] + "；可按 Ctrl+Z 撤回。");
+                    showActionFeedback(action, i18n ? i18n.format("swapComplete", {
+                        first: names[1], second: names[2]
+                    }) : "互换完成：" + names[1] + " ⇄ " + names[2] + "；可按 Ctrl+Z 撤回。");
                 } else {
                     showActionFeedback(action, "没有取得图片互换的完成结果，请重新打开灵绘面板后重试。");
                     return;
@@ -350,6 +387,82 @@
             }
             window.setTimeout(pollHostState, 80);
         }, 0);
+    }
+
+    function compareVersions(left, right) {
+        var leftParts = String(left).split(".");
+        var rightParts = String(right).split(".");
+        for (var i = 0; i < 3; i++) {
+            var leftNumber = Number(leftParts[i]);
+            var rightNumber = Number(rightParts[i]);
+            if (leftNumber > rightNumber) return 1;
+            if (leftNumber < rightNumber) return -1;
+        }
+        return 0;
+    }
+
+    function checkForUpdates(button) {
+        if (updateChecking) return;
+        updateChecking = true;
+        var label = button.querySelector("span");
+        button.disabled = true;
+        if (label) label.textContent = translated("checking");
+
+        function finish() {
+            updateChecking = false;
+            button.disabled = false;
+            if (label) label.textContent = translated("checkUpdates");
+        }
+
+        function showFailure() {
+            window.alert(translated("updateFailed"));
+        }
+
+        var request = new XMLHttpRequest();
+        request.timeout = 15000;
+        request.open("GET", updateManifestUrl + "?t=" + new Date().getTime(), true);
+        request.setRequestHeader("Accept", "application/json");
+        request.onload = function () {
+            try {
+                if (request.status < 200 || request.status >= 300) throw new Error("HTTP " + request.status);
+                var release = JSON.parse(request.responseText);
+                if (!release || release.product !== "com.ronniejiao.linghui" ||
+                        typeof release.latestVersion !== "string" ||
+                        !/^\d+\.\d+\.\d+$/.test(release.latestVersion) ||
+                        typeof release.downloadUrl !== "string" ||
+                        release.downloadUrl !== "https://api.spotcue.cekoro.cn/linghui-updates/Linghui-CEP-" +
+                            release.latestVersion + ".zip" ||
+                        typeof release.sha256 !== "string" || !/^[a-f0-9]{64}$/i.test(release.sha256)) {
+                    throw new Error("Invalid update manifest");
+                }
+
+                var comparison = compareVersions(release.latestVersion, hostVersion);
+                if (comparison === 0) {
+                    window.alert(i18n ? i18n.format("updateCurrent", { version: hostVersion }) : "灵绘已是最新版本（" + hostVersion + "）。");
+                } else if (comparison < 0) {
+                    window.alert(i18n ? i18n.format("updateAhead", {
+                        current: hostVersion, latest: release.latestVersion
+                    }) : "当前版本（" + hostVersion + "）高于更新服务器所列版本（" + release.latestVersion + "）。");
+                } else if (window.confirm(i18n ? i18n.format("updatePrompt", { version: release.latestVersion }) : "发现灵绘新版本 " + release.latestVersion + "。\n下载后解压并运行安装脚本即可更新。\n\n现在打开下载包？")) {
+                    if (!cs || typeof cs.openURLInDefaultBrowser !== "function") {
+                        throw new Error("Default browser bridge unavailable");
+                    }
+                    cs.openURLInDefaultBrowser(release.downloadUrl);
+                }
+            } catch (error) {
+                showFailure();
+            }
+            finish();
+        };
+        request.onerror = function () { finish(); showFailure(); };
+        request.ontimeout = function () { finish(); showFailure(); };
+        request.onabort = function () { finish(); showFailure(); };
+        try {
+            request.send(null);
+        } catch (error) {
+            finish();
+            showFailure();
+        }
     }
 
     var tooltips = {
@@ -360,17 +473,43 @@
         "link-batch": "选择图片或文件夹，替换选中图片并按文件名修复文档中的缺失图片。",
         "link-swap": "互换链接或嵌入图片；缺失链接也可参与互换。",
         "link-pictures": "将选中的已有链接重新链接到新选图片，按画面顺序逐张替换，保留中心、高度和旋转。",
+        "check-updates": "查询灵绘更新服务器上的最新版本。",
         "compress-scan": "扫描当前 AI 文件大小、画板及链接资源。",
         "compress-save": "按当前设置优化并另存为新 AI 文件。",
         "compress-overwrite": "按当前设置优化并覆盖保存当前 AI 文件。"
     };
 
+    function updateTooltips() {
+        document.querySelectorAll("button[data-action]").forEach(function (button) {
+            if (tooltips[button.dataset.action]) {
+                button.title = i18n ? i18n.translateMessage(tooltips[button.dataset.action]) : tooltips[button.dataset.action];
+            }
+        });
+    }
+
     document.querySelectorAll("button[data-action]").forEach(function (button) {
         button.addEventListener("click", function () {
             var action = button.dataset.action;
+            if (action === "check-updates") {
+                checkForUpdates(button);
+                return;
+            }
+            if (action === "toggle-language") {
+                if (i18n) i18n.toggleLanguage();
+                return;
+            }
             invoke(action);
         });
-        if (tooltips[button.dataset.action]) button.title = tooltips[button.dataset.action];
+    });
+
+    updateTooltips();
+    window.addEventListener("linghui-language-change", function () {
+        document.querySelectorAll("[data-linghui-source]").forEach(function (element) {
+            element.textContent = i18n ? i18n.translateMessage(element.getAttribute("data-linghui-source"))
+                : element.getAttribute("data-linghui-source");
+        });
+        updateTooltips();
+        evalHost("void 0;", null, 0);
     });
 
     activateTab(tabs[0], false);

@@ -32,7 +32,7 @@ if ($bundleId -ne 'com.ronniejiao.linghui' -or $panelId -ne 'com.ronniejiao.ling
 
 $requiredFiles = @(
     'index.html', 'css\panel.css', 'lib\CSInterface.js',
-    'js\startup.js', 'js\panel.js', 'js\native-picker.js',
+    'js\i18n.js', 'js\startup.js', 'js\panel.js', 'js\native-picker.js',
     'host\cep-entry.jsx', 'host\linghui.jsx',
     'native\BatchSourcePicker-1.0.4.exe', 'CSXS\manifest.xml'
 )
