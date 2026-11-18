@@ -54,21 +54,15 @@ Illustrator 文档编辑和图片文件操作均在本机执行。检查更新�
 
 - `CEP/`：CEP 面板、宿主脚本、样式和 Windows 原生选择器。
 - `wiki/`：项目文档源文件。
-- `tests/`：定向检查脚本；部分脚本需要 Illustrator。
 - `灵绘.jsx`：独立 ExtendScript 工具。
 - `Install-CEP-Panel.ps1`、`安装灵绘CEP.cmd`：CEP 面板安装入口。
 - `安装灵绘自动启动.ps1`、`安装灵绘自动启动.cmd`：独立脚本启动入口安装程序。
-- `Build-Native-Picker.ps1`：Windows 原生选择器构建脚本。
 
 ### 文档
 
 - [项目 Wiki](wiki/Home.md)
 - [功能说明](wiki/Features.md)
 - [安装与更新](wiki/Installation.md)
-- [故障排查](wiki/Troubleshooting.md)
-- [开发指南](wiki/Development.md)
-- [更新记录](CEP/CHANGELOG.md)
-- [第三方声明](CEP/THIRD-PARTY-NOTICES.md)
 
 `wiki/` 随项目源码维护，不会自动发布到 GitHub 独立 Wiki 标签页。
 
@@ -78,7 +72,7 @@ Illustrator 文档编辑和图片文件操作均在本机执行。检查更新�
 
 ### 许可证
 
-仓库目前没有根目录 `LICENSE` 文件，因此尚未声明代码复用和再分发许可。Adobe CEP SDK 相关说明见[第三方声明](CEP/THIRD-PARTY-NOTICES.md)。
+仓库目前没有根目录 `LICENSE` 文件，因此尚未声明代码复用和再分发许可。Adobe CEP SDK 原始版权与许可提示保留在 `CEP/lib/CSInterface.js` 文件头；重新分发前请查看 [Adobe CEP SDK 许可材料](https://github.com/Adobe-CEP/CEP-Resources/tree/master/License)。
 
 ## English
 
@@ -134,13 +128,12 @@ In Illustrator, choose **File → Scripts → Other Script…** and select `灵�
 .
 ├── CEP/                       # CEP panel, host scripts, styles, and native Windows picker
 ├── wiki/                      # Project documentation source
-├── tests/                     # Targeted checks; some require Illustrator
 ├── 灵绘.jsx                   # Standalone ExtendScript tool
 ├── 灵绘自动启动.jsx           # Standalone startup entry
 ├── Install-CEP-Panel.ps1      # CEP installation and file verification
 ├── 安装灵绘CEP.cmd            # CEP installer shortcut
 ├── 安装灵绘自动启动.ps1       # Standalone startup installer
-└── Build-Native-Picker.ps1    # Native Windows picker build script
+└── 安装灵绘自动启动.cmd       # Standalone startup installer shortcut
 ```
 
 ### Documentation
@@ -148,10 +141,6 @@ In Illustrator, choose **File → Scripts → Other Script…** and select `灵�
 - [Project wiki](wiki/Home.md)
 - [Features](wiki/Features.md)
 - [Installation and updates](wiki/Installation.md)
-- [Troubleshooting](wiki/Troubleshooting.md)
-- [Development guide](wiki/Development.md)
-- [Changelog](CEP/CHANGELOG.md)
-- [Third-party notices](CEP/THIRD-PARTY-NOTICES.md)
 
 The `wiki/` directory is maintained with the source repository. It is not automatically published to GitHub's separate Wiki tab.
 
@@ -161,7 +150,7 @@ Include your Windows and Illustrator versions, the Linghui version, steps to rep
 
 ### License
 
-This repository does not currently include a root `LICENSE` file, so no license for reuse or redistribution has been declared. Adobe CEP SDK notices are in [THIRD-PARTY-NOTICES.md](CEP/THIRD-PARTY-NOTICES.md).
+This repository does not currently include a root `LICENSE` file, so no license for reuse or redistribution has been declared. The original Adobe CEP SDK copyright and license notice remains in the header of `CEP/lib/CSInterface.js`; review the [Adobe CEP SDK license materials](https://github.com/Adobe-CEP/CEP-Resources/tree/master/License) before redistribution.
 
 ---
 

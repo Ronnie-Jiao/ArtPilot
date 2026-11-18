@@ -6,8 +6,6 @@
 
 - [安装与更新](Installation.md)：系统要求、CEP 安装、更新和独立 JSX 脚本。
 - [功能说明](Features.md)：尺寸、缺图修复、互换链接、替换图片和无损压缩的用途与区别。
-- [故障排查](Troubleshooting.md)：空白面板、连接失败、按钮无响应和图片链接问题。
-- [开发指南](Development.md)：源码结构、本地选择器和验证入口。
 
 本目录保存随主仓库版本管理的 Wiki 页面源码。根目录 [README](../README.md) 是 GitHub 访客的项目介绍；这里的页面尚未自动同步到 GitHub 的独立 Wiki 标签页。
 
@@ -18,4 +16,4 @@
 - 可独立运行的脚本：`灵绘.jsx`
 - CEP 面板安装：`安装灵绘CEP.cmd`
 
-当前版本号以 `CEP/CSXS/manifest.xml` 为准，功能和验收记录见 [更新记录](../CEP/CHANGELOG.md)。
+当前版本号以 `CEP/CSXS/manifest.xml` 为准。
