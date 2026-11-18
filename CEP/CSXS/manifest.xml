@@ -2,19 +2,19 @@
 <ExtensionManifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     ExtensionBundleId="com.ronniejiao.linghui"
     ExtensionBundleVersion="1.1.33"
-    Version="12.0">
+    Version="6.0">
     <ExtensionList>
         <Extension Id="com.ronniejiao.linghui.panel" Version="1.1.33" />
     </ExtensionList>
     <ExecutionEnvironment>
         <HostList>
-            <Host Name="ILST" Version="[29.5,99.9]" />
+            <Host Name="ILST" Version="[22.0,30.0]" />
         </HostList>
         <LocaleList>
             <Locale Code="All" />
         </LocaleList>
         <RequiredRuntimeList>
-            <RequiredRuntime Name="CSXS" Version="12.0" />
+            <RequiredRuntime Name="CSXS" Version="8.0" />
         </RequiredRuntimeList>
     </ExecutionEnvironment>
     <DispatchInfoList>

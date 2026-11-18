@@ -98,12 +98,17 @@ try {
     throw
 }
 
-# This local unsigned package uses the current user's CEP 12 development mode.
-$registryPath = 'HKCU:\Software\Adobe\CSXS.12'
-if (-not (Test-Path -LiteralPath $registryPath)) {
-    New-Item -Path $registryPath -Force | Out-Null
+# Enable unsigned extensions for the CEP runtimes covered by this package.
+# Illustrator versions may load their bundled CEP runtime, so set each key
+# from the declared minimum through the current supported runtime.
+$runtimeVersion = [int][double]$manifest.ExtensionManifest.ExecutionEnvironment.RequiredRuntimeList.RequiredRuntime.Version
+for ($cepVersion = $runtimeVersion; $cepVersion -le 12; $cepVersion++) {
+    $registryPath = "HKCU:\Software\Adobe\CSXS.$cepVersion"
+    if (-not (Test-Path -LiteralPath $registryPath)) {
+        New-Item -Path $registryPath -Force | Out-Null
+    }
+    New-ItemProperty -Path $registryPath -Name 'PlayerDebugMode' -PropertyType String -Value '1' -Force | Out-Null
 }
-New-ItemProperty -Path $registryPath -Name 'PlayerDebugMode' -PropertyType String -Value '1' -Force | Out-Null
 
 $cacheBackups = @()
 $cacheRefresh = 'skipped: panel process is active or process information is unavailable'

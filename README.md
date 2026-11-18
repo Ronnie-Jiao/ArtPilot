@@ -22,8 +22,10 @@ Illustrator 文档编辑和图片文件操作均在本机执行。检查更新�
 ### 系统要求
 
 - Windows
-- Adobe Illustrator 29.5 或更高版本（Illustrator 2025 或更新版本）
-- Adobe CEP 12 运行时
+- Adobe Illustrator 22.0 或更高版本（Illustrator 2018 或更新版本）
+- Adobe CEP 8 或更高版本
+
+Illustrator 22.0 / CEP 8 是当前声明的最低兼容目标；该最低版本尚未完成实机验证，具体功能可能因 Illustrator 版本而异。
 
 ### 安装 CEP 面板
 
@@ -44,7 +46,7 @@ Illustrator 文档编辑和图片文件操作均在本机执行。检查更新�
 
 安装程序会将面板复制到当前用户的 CEP 扩展目录，备份已有安装，并用 SHA-256 校验复制文件。它不会关闭 Illustrator。安装或更新后请重启 Illustrator，让宿主脚本载入新版本。
 
-这是未签名的 CEP 扩展。安装程序会为当前 Windows 用户启用 CEP 12 的 `PlayerDebugMode`，以便 Illustrator 加载扩展。请只安装信任来源的代码。详情见[安装与更新](wiki/Installation.md)。
+这是未签名的 CEP 扩展。安装程序会为当前 Windows 用户启用 CEP 8 至 CEP 12 的 `PlayerDebugMode`，以便兼容不同版本的 Illustrator。请只安装信任来源的代码。详情见[安装与更新](wiki/Installation.md)。
 
 ### 运行独立 JSX 工具
 
@@ -94,8 +96,10 @@ Illustrator document edits and image-file operations run locally. The update che
 ### Requirements
 
 - Windows
-- Adobe Illustrator 29.5 or later (Illustrator 2025 or later)
-- Adobe CEP 12 runtime
+- Adobe Illustrator 22.0 or later (Illustrator 2018 or later)
+- Adobe CEP 8 runtime or later
+
+The manifest declares Illustrator 22.0 / CEP 8 as its compatibility floor. This oldest target has not yet been verified in a live Illustrator installation, so behavior may vary by host version.
 
 ### Install the CEP panel
 
@@ -116,7 +120,7 @@ Illustrator document edits and image-file operations run locally. The update che
 
 The installer copies the panel to the current user's CEP extensions folder, backs up an existing installation, and verifies copied files with SHA-256. It does not close Illustrator. Restart Illustrator after installation or an update so the host scripts load the new version.
 
-This is an unsigned CEP extension. The installer enables CEP 12 `PlayerDebugMode` for the current Windows user so Illustrator can load it. Install only from source you trust. See [Installation and updates](wiki/Installation.md) for details.
+This is an unsigned CEP extension. The installer enables `PlayerDebugMode` for CEP 8 through CEP 12 for the current Windows user, allowing different Illustrator versions to load the extension. Install only from source you trust. See [Installation and updates](wiki/Installation.md) for details.
 
 ### Run the standalone JSX tool
 

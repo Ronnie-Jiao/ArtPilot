@@ -32,7 +32,8 @@
         var title = chooseDirectory ? translated("chooseFolder", "选择文件夹") : translated("chooseFile", "选择文件");
         var result;
         // The CEP filesystem API opens the OS dialog directly, without a
-        // BridgeTalk application target. Adobe CEP 12 documents both methods.
+        // BridgeTalk application target. Keep the older showOpenDialog path
+        // for CEP runtimes that do not expose the extended dialog method.
         if (typeof fileSystem.showOpenDialogEx === "function") {
             result = fileSystem.showOpenDialogEx(false, !!chooseDirectory, title, initial,
                 chooseDirectory ? [] : ["*"], translated("allFiles", "所有文件"),

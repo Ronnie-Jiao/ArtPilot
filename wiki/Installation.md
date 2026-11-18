@@ -3,8 +3,10 @@
 ## 系统要求
 
 - Windows
-- Adobe Illustrator 29.5 或更高版本（Illustrator 2025 及更新版本；以 CEP 清单声明为准）
-- CEP 12
+- Adobe Illustrator 22.0 或更高版本（Illustrator 2018 及更新版本）
+- CEP 8 或更高版本
+
+Illustrator 22.0 / CEP 8 是当前声明的最低兼容目标；该最低版本尚未完成实机验证，具体功能可能因 Illustrator 版本而异。
 
 本仓库的 CEP 安装脚本依赖 Windows PowerShell、用户注册表和 `%APPDATA%`。当前安装流程面向 Windows。
 
@@ -36,10 +38,12 @@
 这是本机未签名的 CEP 扩展。安装脚本会设置当前用户的：
 
 ```text
+HKCU\Software\Adobe\CSXS.8\PlayerDebugMode = "1"
+...
 HKCU\Software\Adobe\CSXS.12\PlayerDebugMode = "1"
 ```
 
-此设置影响当前 Windows 用户下的 CEP 12 扩展。仅运行你信任的源码；若手动关闭开发者模式，请先确认其他 CEP 扩展不依赖此设置，再删除该注册表值。
+安装脚本会为当前 Windows 用户启用 CEP 8 至 CEP 12 的 `PlayerDebugMode`，以便不同 Illustrator 版本加载未签名扩展。仅运行你信任的源码；若手动关闭开发者模式，请先确认其他 CEP 扩展不依赖这些设置，再删除相应注册表值。
 
 ## 更新面板
 
