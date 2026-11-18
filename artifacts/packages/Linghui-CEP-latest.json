@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "product": "com.ronniejiao.linghui",
+  "latestVersion": "1.1.31",
+  "packageName": "Linghui-CEP-1.1.31.zip",
+  "downloadUrl": "https://api.spotcue.cekoro.cn/linghui-updates/Linghui-CEP-1.1.31.zip",
+  "sha256": "485ce04afe07d3b68df644ab7b70d1b0bc0936ca2063badf0ccd3e55693e00f6",
+  "publishedAt": "2026-11-12",
+  "releaseNotes": [
+    "新增 HTTPS 更新检查按钮。",
+    "将“搜索子目录”放回快捷操作区下方。",
+    "去掉外层投影并放大面板内容。"
+  ]
+}
